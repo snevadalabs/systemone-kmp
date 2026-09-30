@@ -1,0 +1,33 @@
+{
+  "id": "error-400-error-string",
+  "description": "{error: string} — the string is the message.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 400,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "error": "plain string"
+      }
+    }
+  ],
+  "expect": {
+    "error": "BadRequestError",
+    "message": "plain string"
+  }
+}

@@ -1,0 +1,77 @@
+name: publish
+
+# Tag-driven, and only tag-driven: no pull_request path reaches this workflow, so the publishing secrets can
+# never be exposed to a fork. The Apple targets it must build mean it runs on macOS.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platforms;android-36"
+      - uses: gradle/actions/setup-gradle@v6
+
+      # Refuse to publish a version the changelog does not describe.
+      - run: ./gradlew checkVersion
+
+      # The release-time mutation run, and deliberately non-gating: mutation testing has no threshold that
+      # means anything at this size (one mutant is 0.14pp, repeat runs flip 0.8%), and a release must not fail
+      # on a measurement. A tag push (or a manual dispatch) is the only moment anyone releases, so the test
+      # strength it prints and the survivor count (from build/reports/pitest/mutations.xml) land in the run's
+      # output either way, and the report is uploaded as an artifact.
+      - run: ./gradlew pitestJvm
+        continue-on-error: true
+        timeout-minutes: 20
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: pitest
+          path: build/reports/pitest
+          if-no-files-found: ignore
+
+      # A version is published once, and asking twice creates a deployment that fails as a duplicate. repo1
+      # lags the Portal by up to an hour, so ask the Portal, which knows the moment the coordinates are taken.
+      - name: Look for this version on the Central Portal
+        id: central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          version=$(sed -nE 's/^version=(.*)$/\1/p' gradle.properties)
+          token=$(printf '%s:%s' "$ORG_GRADLE_PROJECT_mavenCentralUsername" "$ORG_GRADLE_PROJECT_mavenCentralPassword" | base64)
+          curl -sf -H "Authorization: Bearer $token" \
+            https://central.sonatype.com/api/v1/publisher/deployments > deployments.json
+          live=$(python3 -c "import json,sys; name='com.sierranevadalabs-systemone-kmp-'+sys.argv[1]; print(any(d['deploymentName']==name and d['deploymentState'] in ('PUBLISHING','PUBLISHED') for d in json.load(open('deployments.json'))['deployments']))" "$version")
+          if [ "$live" = "True" ]; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::systemone-kmp $version already has a deployment on the Central Portal; nothing uploaded."
+          fi
+
+      # Releases the deployment as well as uploading it. A tag push is the human gate, so a permanent version
+      # number is spent the moment this runs; `publishToMavenCentral` alone would leave the deployment as a
+      # draft that nobody remembers to release. `checkSigningKey` comes along as a dependency of every publish
+      # task, and refuses to upload unless every signature names the project key.
+      #
+      # No ORG_GRADLE_PROJECT_signingInMemoryKeyId: KGP's checkSigningConfiguration uses that value for its
+      # keyserver lookup, and Hockeypuck does not resolve a 32-bit short id. Gradle signs correctly without
+      # it, and the signature carries the full key id that Maven Central validates against.
+      - run: ./gradlew publishAndReleaseToMavenCentral
+        if: steps.central.outputs.already != 'true'
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}

@@ -1,0 +1,31 @@
+{
+  "id": "error-502-html-body",
+  "description": "A non-JSON error body: a gateway's HTML page. The raw text is the message, and it must not be parsed as JSON.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 502,
+      "headers": {
+        "content-type": "text/html"
+      },
+      "bodyRaw": "<h1>bad gateway</h1>"
+    }
+  ],
+  "expect": {
+    "error": "InternalServerError",
+    "message": "<h1>bad gateway</h1>"
+  }
+}

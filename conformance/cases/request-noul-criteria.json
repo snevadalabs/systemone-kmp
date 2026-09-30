@@ -1,0 +1,49 @@
+{
+  "id": "request-noul-criteria",
+  "description": "A noul question that describes both of its outcomes; an undescribed side is omitted, never null.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Congratulations, you have won a prize!",
+      "model": "jev-latest",
+      "questions": {
+        "spam": {
+          "type": "noul",
+          "instructions": "Is this spam?",
+          "criteria": {
+            "true": "unsolicited advertising",
+            "false": "the recipient asked for it"
+          }
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 9,
+          "output_tokens": 1
+        },
+        "answers": {
+          "spam": {
+            "type": "noul",
+            "noul": 0.12
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "spam": "noul"
+    },
+    "usage": "present"
+  }
+}

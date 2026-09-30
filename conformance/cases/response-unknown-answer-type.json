@@ -1,0 +1,71 @@
+{
+  "id": "response-unknown-answer-type",
+  "description": "A server answer type no 0.1.0 client knows, beside two it does. The unknown one must survive as its own variant, not crash the call.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        },
+        "category": {
+          "type": "choice",
+          "instructions": "What is this about?",
+          "criteria": {
+            "billing": null,
+            "technical": null
+          }
+        },
+        "impact": {
+          "type": "score",
+          "instructions": "How bad is it?",
+          "criteria": [
+            "can wait",
+            "this week",
+            "today"
+          ]
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3
+        },
+        "answers": {
+          "urgent": {
+            "type": "noul",
+            "noul": 0.91
+          },
+          "mystery": {
+            "type": "sentiment",
+            "label": "frustrated",
+            "confidence": 0.6
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "urgent": "noul",
+      "mystery": "unknown"
+    },
+    "unknownTypes": {
+      "mystery": "sentiment"
+    },
+    "usage": "present"
+  }
+}

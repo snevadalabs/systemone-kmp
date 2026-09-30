@@ -1,0 +1,41 @@
+{
+  "id": "response-usage-absent",
+  "description": "A 200 with no usage object at all. Usage is optional on the wire.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "answers": {
+          "urgent": {
+            "type": "noul",
+            "noul": 0.4
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "urgent": "noul"
+    },
+    "usage": "absent"
+  }
+}

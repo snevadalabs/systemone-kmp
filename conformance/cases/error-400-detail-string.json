@@ -1,0 +1,33 @@
+{
+  "id": "error-400-detail-string",
+  "description": "{detail: string} — FastAPI's older simple form.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 400,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "detail": "fastapi style"
+      }
+    }
+  ],
+  "expect": {
+    "error": "BadRequestError",
+    "message": "fastapi style"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "id": "retry-after-seconds",
+  "description": "A 429 carrying `Retry-After: 2` (seconds) is retried once and then succeeds. The 2s is the delay before the retry.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 429,
+      "headers": {
+        "content-type": "application/json",
+        "retry-after": "2"
+      },
+      "body": {
+        "error": {
+          "message": "Rate limit exceeded"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 3,
+          "output_tokens": 1
+        },
+        "answers": {
+          "urgent": {
+            "type": "noul",
+            "noul": 0.7
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "delayMs": 2000,
+    "answers": {
+      "urgent": "noul"
+    },
+    "usage": "present"
+  }
+}

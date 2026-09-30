@@ -1,0 +1,88 @@
+{
+  "id": "request-primitives-string-state",
+  "description": "The request body for all three primitives in one call, with a plain-string state.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Help! My payouts have been failing for 3 days.",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        },
+        "category": {
+          "type": "choice",
+          "instructions": "What is this about?",
+          "criteria": {
+            "billing": null,
+            "technical": null
+          }
+        },
+        "impact": {
+          "type": "score",
+          "instructions": "How bad is it?",
+          "criteria": [
+            "can wait",
+            "this week",
+            "today"
+          ]
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3
+        },
+        "answers": {
+          "urgent": {
+            "type": "noul",
+            "noul": 0.91
+          },
+          "category": {
+            "type": "choice",
+            "choice": "billing",
+            "confidence": 0.87,
+            "probabilities": {
+              "billing": 0.87,
+              "technical": 0.13
+            }
+          },
+          "impact": {
+            "type": "score",
+            "score": 1.7,
+            "confidence": 0.8,
+            "legend": {
+              "0": "can wait",
+              "1": "this week",
+              "2": "today"
+            },
+            "probabilities": {
+              "0": 0.1,
+              "1": 0.1,
+              "2": 0.8
+            }
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "urgent": "noul",
+      "category": "choice",
+      "impact": "score"
+    },
+    "usage": "present"
+  }
+}

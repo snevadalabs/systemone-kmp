@@ -1,0 +1,45 @@
+{
+  "id": "response-usage-without-billing-units",
+  "description": "The OpenAPI schema requires usage.billing_units; the API has never sent it. The SDK must not require it.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 2
+        },
+        "answers": {
+          "urgent": {
+            "type": "noul",
+            "noul": 0.4
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "urgent": "noul"
+    },
+    "usage": "present"
+  }
+}

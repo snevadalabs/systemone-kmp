@@ -1,0 +1,69 @@
+{
+  "id": "error-422-detail-list",
+  "description": "FastAPI's {detail: [{loc, msg}]} validation form. Each entry contributes 'path: msg', the leading 'body' loc is dropped, entries are joined with '; '.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        },
+        "category": {
+          "type": "choice",
+          "instructions": "What is this about?",
+          "criteria": {
+            "billing": null,
+            "technical": null
+          }
+        },
+        "impact": {
+          "type": "score",
+          "instructions": "How bad is it?",
+          "criteria": [
+            "can wait",
+            "this week",
+            "today"
+          ]
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 422,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "detail": [
+          {
+            "type": "list_type",
+            "loc": [
+              "body",
+              "questions",
+              "impact",
+              "criteria"
+            ],
+            "msg": "Input should be a valid list"
+          },
+          {
+            "type": "too_short",
+            "loc": [
+              "body",
+              "questions"
+            ],
+            "msg": "Dictionary should have at least 1 item"
+          }
+        ]
+      }
+    }
+  ],
+  "expect": {
+    "error": "UnprocessableEntityError",
+    "message": "questions.impact.criteria: Input should be a valid list; questions: Dictionary should have at least 1 item"
+  }
+}

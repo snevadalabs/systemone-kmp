@@ -1,0 +1,58 @@
+{
+  "id": "response-score-stringified-keys",
+  "description": "legend and probabilities arrive with stringified integer ordinals. They must decode, not be rejected.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "quality": {
+          "type": "score",
+          "instructions": "How good is it?",
+          "criteria": [
+            "bad",
+            "great"
+          ]
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 8,
+          "output_tokens": 1
+        },
+        "answers": {
+          "quality": {
+            "type": "score",
+            "score": 1.2,
+            "confidence": 0.75,
+            "legend": {
+              "0": "bad",
+              "1": "great"
+            },
+            "probabilities": {
+              "0": 0.2,
+              "1": 0.8
+            }
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "quality": "score"
+    },
+    "usage": "present"
+  }
+}

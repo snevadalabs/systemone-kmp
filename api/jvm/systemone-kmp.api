@@ -1,0 +1,341 @@
+public abstract interface class com/sierranevadalabs/systemone/sdk/Answer {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/AnswerTypeMismatchException : java/lang/ClassCastException {
+	public fun <init> (Ljava/lang/String;)V
+}
+
+public final class com/sierranevadalabs/systemone/sdk/ChoiceAnswer : com/sierranevadalabs/systemone/sdk/Answer {
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;D)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/Map;
+	public final fun component3 ()D
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;D)Lcom/sierranevadalabs/systemone/sdk/ChoiceAnswer;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/ChoiceAnswer;Ljava/lang/String;Ljava/util/Map;DILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/ChoiceAnswer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChoice ()Ljava/lang/String;
+	public final fun getConfidence ()D
+	public final fun getProbabilities ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/ChoiceQuestion : com/sierranevadalabs/systemone/sdk/Question {
+	public fun <init> (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/Map;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun copy (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/Map;)Lcom/sierranevadalabs/systemone/sdk/ChoiceQuestion;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/ChoiceQuestion;Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/Map;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/ChoiceQuestion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getId ()Ljava/lang/String;
+	public final fun getOptions ()Ljava/util/Map;
+	public fun getPrompt ()Lkotlinx/serialization/json/JsonElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/ClientKt {
+	public static final fun SystemOneClient (Lcom/sierranevadalabs/systemone/sdk/SystemOneConfig;)Lcom/sierranevadalabs/systemone/sdk/SystemOneClient;
+	public static final fun systemOne-dp_umgU (Lcom/sierranevadalabs/systemone/sdk/SystemOneClient;Ljava/lang/String;[Lcom/sierranevadalabs/systemone/sdk/Question;Ljava/lang/String;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun systemOne-dp_umgU$default (Lcom/sierranevadalabs/systemone/sdk/SystemOneClient;Ljava/lang/String;[Lcom/sierranevadalabs/systemone/sdk/Question;Ljava/lang/String;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/HeadersKt {
+	public static final field SDK_VERSION Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/LogLevel : java/lang/Enum {
+	public static final field Debug Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public static final field Error Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public static final field Info Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public static final field Off Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public static final field Warn Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public static fun values ()[Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/ModelCard {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/sierranevadalabs/systemone/sdk/ModelCard;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/ModelCard;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/ModelCard;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDescription ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getReleaseDate ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/sierranevadalabs/systemone/sdk/Models {
+	public abstract fun list-5EIzBIU (Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun list-5EIzBIU$default (Lcom/sierranevadalabs/systemone/sdk/Models;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/Models$DefaultImpls {
+	public static synthetic fun list-5EIzBIU$default (Lcom/sierranevadalabs/systemone/sdk/Models;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/NoulAnswer : com/sierranevadalabs/systemone/sdk/Answer {
+	public fun <init> (D)V
+	public final fun component1 ()D
+	public final fun copy (D)Lcom/sierranevadalabs/systemone/sdk/NoulAnswer;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/NoulAnswer;DILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/NoulAnswer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNoul ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/NoulCriteria {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lkotlinx/serialization/json/JsonElement;Lkotlinx/serialization/json/JsonElement;)V
+	public final fun component1 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun copy (Lkotlinx/serialization/json/JsonElement;Lkotlinx/serialization/json/JsonElement;)Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;Lkotlinx/serialization/json/JsonElement;Lkotlinx/serialization/json/JsonElement;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIfFalse ()Lkotlinx/serialization/json/JsonElement;
+	public final fun getIfTrue ()Lkotlinx/serialization/json/JsonElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/NoulQuestion : com/sierranevadalabs/systemone/sdk/Question {
+	public fun <init> (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun component3 ()Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;
+	public final fun copy (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;)Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCriteria ()Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;
+	public fun getId ()Ljava/lang/String;
+	public fun getPrompt ()Lkotlinx/serialization/json/JsonElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/sierranevadalabs/systemone/sdk/Question {
+	public abstract fun getId ()Ljava/lang/String;
+	public abstract fun getPrompt ()Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/QuestionsKt {
+	public static final fun choice (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)Lcom/sierranevadalabs/systemone/sdk/ChoiceQuestion;
+	public static final fun choice (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/Map;)Lcom/sierranevadalabs/systemone/sdk/ChoiceQuestion;
+	public static final fun noul (Ljava/lang/String;Ljava/lang/String;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;)Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;
+	public static final fun noul (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;)Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;
+	public static synthetic fun noul$default (Ljava/lang/String;Ljava/lang/String;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;
+	public static synthetic fun noul$default (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Lcom/sierranevadalabs/systemone/sdk/NoulCriteria;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/NoulQuestion;
+	public static final fun score (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lcom/sierranevadalabs/systemone/sdk/ScoreQuestion;
+	public static final fun score (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/List;)Lcom/sierranevadalabs/systemone/sdk/ScoreQuestion;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/RetryPolicy {
+	public synthetic fun <init> (JJJDILjava/util/Set;ZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJJDILjava/util/Set;ZZZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-UwyO8pc ()J
+	public final fun component2-UwyO8pc ()J
+	public final fun component3-UwyO8pc ()J
+	public final fun component4 ()D
+	public final fun component5 ()I
+	public final fun component6 ()Ljava/util/Set;
+	public final fun component7 ()Z
+	public final fun component8 ()Z
+	public final fun component9 ()Z
+	public final fun copy-hTMF5Xc (JJJDILjava/util/Set;ZZZ)Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;
+	public static synthetic fun copy-hTMF5Xc$default (Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;JJJDILjava/util/Set;ZZZILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getApiConnectionError ()Z
+	public final fun getApiTimeoutError ()Z
+	public final fun getBackoffInitial-UwyO8pc ()J
+	public final fun getBackoffJitter ()D
+	public final fun getBackoffMax-UwyO8pc ()J
+	public final fun getHttpStatuses ()Ljava/util/Set;
+	public final fun getMaxRetries ()I
+	public final fun getMaxRetryAfter-UwyO8pc ()J
+	public final fun getRespectRetryAfter ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/ScoreAnswer : com/sierranevadalabs/systemone/sdk/Answer {
+	public fun <init> (DLjava/util/Map;Ljava/util/Map;D)V
+	public final fun component1 ()D
+	public final fun component2 ()Ljava/util/Map;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun component4 ()D
+	public final fun copy (DLjava/util/Map;Ljava/util/Map;D)Lcom/sierranevadalabs/systemone/sdk/ScoreAnswer;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/ScoreAnswer;DLjava/util/Map;Ljava/util/Map;DILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/ScoreAnswer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getConfidence ()D
+	public final fun getLegend ()Ljava/util/Map;
+	public final fun getProbabilities ()Ljava/util/Map;
+	public final fun getScore ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/ScoreQuestion : com/sierranevadalabs/systemone/sdk/Question {
+	public fun <init> (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/List;)Lcom/sierranevadalabs/systemone/sdk/ScoreQuestion;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/ScoreQuestion;Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/util/List;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/ScoreQuestion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getId ()Ljava/lang/String;
+	public final fun getLevels ()Ljava/util/List;
+	public fun getPrompt ()Lkotlinx/serialization/json/JsonElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/sierranevadalabs/systemone/sdk/SystemOneClient : java/lang/AutoCloseable {
+	public abstract fun getBaseUrl ()Ljava/lang/String;
+	public abstract fun getDefaultHeaders ()Ljava/util/Map;
+	public abstract fun getDefaultModel ()Ljava/lang/String;
+	public abstract fun getLogLevel ()Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public abstract fun getModels ()Lcom/sierranevadalabs/systemone/sdk/Models;
+	public abstract fun getRetry ()Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;
+	public abstract fun getTimeout-UwyO8pc ()J
+	public abstract fun systemOne-Tnuy9kA (Lkotlinx/serialization/json/JsonElement;[Lcom/sierranevadalabs/systemone/sdk/Question;Ljava/lang/String;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun systemOne-Tnuy9kA$default (Lcom/sierranevadalabs/systemone/sdk/SystemOneClient;Lkotlinx/serialization/json/JsonElement;[Lcom/sierranevadalabs/systemone/sdk/Question;Ljava/lang/String;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/SystemOneClient$DefaultImpls {
+	public static synthetic fun systemOne-Tnuy9kA$default (Lcom/sierranevadalabs/systemone/sdk/SystemOneClient;Lkotlinx/serialization/json/JsonElement;[Lcom/sierranevadalabs/systemone/sdk/Question;Ljava/lang/String;Lkotlin/time/Duration;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/SystemOneConfig {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Duration;Ljava/util/Map;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Lcom/sierranevadalabs/systemone/sdk/LogLevel;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Duration;Ljava/util/Map;Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;Lcom/sierranevadalabs/systemone/sdk/LogLevel;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getApiKey ()Ljava/lang/String;
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getDefaultHeaders ()Ljava/util/Map;
+	public final fun getDefaultModel ()Ljava/lang/String;
+	public final fun getEngine ()Lio/ktor/client/engine/HttpClientEngine;
+	public final fun getHttpClientConfig ()Lkotlin/jvm/functions/Function1;
+	public final fun getLogLevel ()Lcom/sierranevadalabs/systemone/sdk/LogLevel;
+	public final fun getProvider ()Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;
+	public final fun getRetry ()Lcom/sierranevadalabs/systemone/sdk/RetryPolicy;
+	public final fun getTimeout-FghU774 ()Lkotlin/time/Duration;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/SystemOneProvider {
+	public static final field Companion Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/Map;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getDefaultModel ()Ljava/lang/String;
+	public final fun getIdentityHeaders ()Ljava/util/Map;
+	public final fun getPathPrefix ()Ljava/lang/String;
+	public final fun getRetryCountHeader ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/SystemOneProvider$Companion {
+	public final fun getLiquid ()Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;
+	public final fun getTypeSafe ()Lcom/sierranevadalabs/systemone/sdk/SystemOneProvider;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/SystemOneResponse {
+	public fun <init> (Ljava/util/Map;Ljava/lang/String;Lcom/sierranevadalabs/systemone/sdk/Usage;Ljava/lang/String;ILjava/util/Map;)V
+	public synthetic fun <init> (Ljava/util/Map;Ljava/lang/String;Lcom/sierranevadalabs/systemone/sdk/Usage;Ljava/lang/String;ILjava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun answerOrNull (Lcom/sierranevadalabs/systemone/sdk/Question;)Lcom/sierranevadalabs/systemone/sdk/Answer;
+	public final fun get (Lcom/sierranevadalabs/systemone/sdk/Question;)Lcom/sierranevadalabs/systemone/sdk/Answer;
+	public final fun getAnswers ()Ljava/util/Map;
+	public final fun getHeaders ()Ljava/util/Map;
+	public final fun getModel ()Ljava/lang/String;
+	public final fun getRequestId ()Ljava/lang/String;
+	public final fun getStatus ()I
+	public final fun getUsage ()Lcom/sierranevadalabs/systemone/sdk/Usage;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/UnknownAnswer : com/sierranevadalabs/systemone/sdk/Answer {
+	public fun <init> (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun copy (Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;)Lcom/sierranevadalabs/systemone/sdk/UnknownAnswer;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/UnknownAnswer;Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/UnknownAnswer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRaw ()Lkotlinx/serialization/json/JsonElement;
+	public final fun getType ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/Usage {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;Ljava/lang/Integer;)V
+	public synthetic fun <init> (Ljava/lang/Integer;Ljava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Integer;
+	public final fun component2 ()Ljava/lang/Integer;
+	public final fun copy (Ljava/lang/Integer;Ljava/lang/Integer;)Lcom/sierranevadalabs/systemone/sdk/Usage;
+	public static synthetic fun copy$default (Lcom/sierranevadalabs/systemone/sdk/Usage;Ljava/lang/Integer;Ljava/lang/Integer;ILjava/lang/Object;)Lcom/sierranevadalabs/systemone/sdk/Usage;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInputTokens ()Ljava/lang/Integer;
+	public final fun getOutputTokens ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public class com/sierranevadalabs/systemone/sdk/errors/APIConnectionError : com/sierranevadalabs/systemone/sdk/errors/SystemOneError {
+}
+
+public class com/sierranevadalabs/systemone/sdk/errors/APIError : com/sierranevadalabs/systemone/sdk/errors/SystemOneError {
+	public final fun getBody ()Lkotlinx/serialization/json/JsonElement;
+	public final fun getRequestId ()Ljava/lang/String;
+	public final fun getStatus ()I
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/APIResponseValidationError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+	public final fun getFieldPath ()Ljava/lang/String;
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/APITimeoutError : com/sierranevadalabs/systemone/sdk/errors/APIConnectionError {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/AuthenticationError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/BadRequestError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/InternalServerError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/NotFoundError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/PermissionDeniedError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/RateLimitError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+	public final fun getRetryAfterMs ()Ljava/lang/Long;
+}
+
+public class com/sierranevadalabs/systemone/sdk/errors/SystemOneError : java/lang/Exception {
+}
+
+public final class com/sierranevadalabs/systemone/sdk/errors/UnprocessableEntityError : com/sierranevadalabs/systemone/sdk/errors/APIError {
+}
+

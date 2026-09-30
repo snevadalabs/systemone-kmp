@@ -1,0 +1,50 @@
+# The pinned toolchain matrix. Every entry was derived from primary sources: Maven Central, Google Maven and
+# the Gradle Plugin Portal. Each one has a safe fallback; check the upstream metadata before moving a pin.
+#
+# The rule that binds most of these: Kotlin 2.3.21 is the exact version Ktor 3.5.2 builds and publishes
+# against, and `kotlin-serialization` must match the compiler exactly.
+
+[versions]
+kotlin = "2.3.21"
+ktor = "3.5.2"
+coroutines = "1.11.0"
+serialization = "1.11.0"
+
+gradle = "9.3.0"
+agp = "9.0.0"
+vanniktechPublish = "0.37.0"
+
+binaryCompatibilityValidator = "0.18.2"
+ktlint = "14.2.0"
+dokka = "2.2.0"
+kover = "0.9.9"
+pitest = "1.22.1"
+# The Gradle plugin and PIT core version independently: 1.19.0 is the newest plugin, 1.22.1 the PIT it runs.
+pitestPlugin = "1.19.0"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+# The `runTest` test-runner only. `kotlin.test` ships no coroutine runner, and `runBlocking` is not in the
+# common source set of `kotlinx-coroutines-core`, so commonTest needs this to launch a suspend call at all.
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+# Command-line PIT only: the tool the `pitestJvm` task runs. Never on a published or runtime classpath.
+pitest-command-line = { module = "org.pitest:pitest-command-line", version.ref = "pitest" }
+
+[plugins]
+android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+pitest = { id = "info.solidsoft.pitest", version.ref = "pitestPlugin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechPublish" }

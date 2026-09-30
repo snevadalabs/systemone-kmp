@@ -1,0 +1,36 @@
+{
+  "id": "error-401-error-object",
+  "description": "{error: {message}} — the shape the live API actually returns.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 401,
+      "headers": {
+        "content-type": "application/json",
+        "x-typesafe-request-id": "req_123"
+      },
+      "body": {
+        "error": {
+          "message": "invalid api key"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "error": "AuthenticationError",
+    "message": "invalid api key"
+  }
+}

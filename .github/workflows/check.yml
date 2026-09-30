@@ -1,0 +1,72 @@
+name: check
+
+# Runs on every push to main and every pull request. It was reduced to `workflow_dispatch` while the org's
+# GitHub Actions billing was blocked; the repository is public now, so standard runners are free and the
+# automatic triggers are back. No secrets reach this workflow, so a pull request from a fork is safe.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # The Linux lane: the primary JVM host, the JS test host (Node), and the Native targets that can only be
+  # built here. linuxArm64 cross-compiles on an x86_64 host but cannot run its tests without an ARM64 machine,
+  # so only its klib is built here.
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platforms;android-36"
+      - uses: gradle/actions/setup-gradle@v6
+      - run: ./gradlew ktlintCheck checkVersion checkJvmBytecode koverVerify jvmTest linuxX64Test jsTest linuxArm64MainKlibrary
+      # A red lane must leave the report behind. The console line for a failed assertion carries the frame, and
+      # not always the message.
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: test-reports-linux
+          path: build/reports/tests
+          if-no-files-found: ignore
+
+  # The Apple lane, and the only host that can build every declared target — so the API dump comparison and
+  # Dokka live here. iosSimulatorArm64Test is the Apple test that actually executes on an arm64 runner;
+  # iosX64Test silently no-ops there, and device targets are compile-only on hosted runners.
+  apple:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platforms;android-36"
+      - uses: gradle/actions/setup-gradle@v6
+      - run: ./gradlew apiCheck iosSimulatorArm64Test macosArm64Test dokkaGenerate
+      # The gate is the dokkaGenerate task above failing; this only delivers the result. It stays tolerant of
+      # an empty output until the public API exists to document.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dokka-html
+          path: build/dokka/html
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: test-reports-apple
+          path: build/reports/tests
+          if-no-files-found: ignore

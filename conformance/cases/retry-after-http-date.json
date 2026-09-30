@@ -1,0 +1,57 @@
+{
+  "id": "retry-after-http-date",
+  "description": "A 429 carrying the HTTP-date form of Retry-After. A date is absolute, so the delay it implies depends on the clock: this case proves the form is accepted and the request is retried, and nothing more. The parsed value itself is asserted by each SDK's own parser test, with an injected clock.",
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 429,
+      "headers": {
+        "content-type": "application/json",
+        "retry-after": "Thu, 01 Jan 1970 00:00:00 GMT"
+      },
+      "body": {
+        "error": {
+          "message": "Rate limit exceeded"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 3,
+          "output_tokens": 1
+        },
+        "answers": {
+          "urgent": {
+            "type": "noul",
+            "noul": 0.7
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "answers": {
+      "urgent": "noul"
+    },
+    "usage": "present"
+  }
+}

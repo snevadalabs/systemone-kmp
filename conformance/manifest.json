@@ -1,0 +1,5 @@
+{
+  "formatVersion": 1,
+  "description": "Cross-language wire-conformance fixtures for the System One API.",
+  "cases": "cases"
+}

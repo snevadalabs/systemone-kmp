@@ -1,0 +1,24 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+
+# Local machine configuration (SDK paths, secrets)
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+
+# Local secrets
+.env*
+
+# Design notes and proposals, kept local
+/docs/

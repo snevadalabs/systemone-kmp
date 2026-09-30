@@ -1,0 +1,44 @@
+{
+  "id": "response-malformed-answer",
+  "description": "A known answer type missing its required value field. A client that validates the response must reject it, naming the field.",
+  "optional": true,
+  "request": {
+    "method": "POST",
+    "path": "/v1/systemone",
+    "body": {
+      "state": "Hello",
+      "model": "jev-latest",
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does this convey urgency?"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/json",
+        "x-typesafe-request-id": "req_123"
+      },
+      "body": {
+        "model": "jev-latest",
+        "usage": {
+          "input_tokens": 1,
+          "output_tokens": 1
+        },
+        "answers": {
+          "urgent": {
+            "type": "noul"
+          }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "error": "APIResponseValidationError",
+    "field": "answers.urgent.noul"
+  }
+}
