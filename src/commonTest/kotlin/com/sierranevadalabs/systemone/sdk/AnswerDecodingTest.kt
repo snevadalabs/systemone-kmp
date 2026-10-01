@@ -276,9 +276,9 @@ class AnswerDecodingTest {
                     .jsonObject
             val expectedField = case.expect["field"]?.jsonPrimitive?.content
             if (expectedField == null) {
-                decodeAnswers(answers)
+                decodeAnswers(WireValue(answers, "answers"))
             } else {
-                val failure = assertFailsWith<ResponseValidationException> { decodeAnswers(answers) }
+                val failure = assertFailsWith<ResponseValidationException> { decodeAnswers(WireValue(answers, "answers")) }
                 assertEquals(expectedField, failure.fieldPath, case.id)
             }
         }
@@ -294,10 +294,11 @@ class AnswerDecodingTest {
                         .body
                         .decodeToString(),
                 ).jsonObject
-        return decodeAnswers(body.getValue("answers").jsonObject)
+        return decodeAnswers(WireValue(body.getValue("answers").jsonObject, "answers"))
     }
 
     private fun fixture(id: String): FixtureCase = loadConformanceCases().first { it.id == id }
 
-    private fun decode(answers: String): Map<String, Answer> = decodeAnswers(Json.parseToJsonElement(answers).jsonObject)
+    private fun decode(answers: String): Map<String, Answer> =
+        decodeAnswers(WireValue(Json.parseToJsonElement(answers).jsonObject, "answers"))
 }
