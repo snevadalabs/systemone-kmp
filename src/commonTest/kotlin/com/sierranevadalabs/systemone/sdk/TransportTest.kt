@@ -4,6 +4,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
 import io.ktor.client.engine.mock.toByteArray
+import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeoutCapability
 import io.ktor.http.ContentType
@@ -16,6 +17,7 @@ import io.ktor.http.toHttpDate
 import io.ktor.util.date.GMTDate
 import io.ktor.util.date.getTimeMillis
 import io.ktor.util.date.truncateToSeconds
+import io.ktor.utils.io.ClosedByteChannelException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
@@ -330,6 +332,36 @@ class TransportTest {
             assertEquals(1, attempts)
             notRetrying.close()
         }
+
+    @Test
+    fun classifiesATimeoutWrappedInAChannelExceptionAsATimeout() =
+        runTest {
+            // CIO closes the read channel on a socket timeout and surfaces `ClosedByteChannelException`, an
+            // `IOException` that wraps the real `SocketTimeoutException`. Reading only the head would report
+            // this timeout as a connection failure, which is the flake this test pins down.
+            val engine =
+                MockEngine {
+                    throw ClosedByteChannelException(
+                        ClosedByteChannelException(SocketTimeoutException("read timed out", null)),
+                    )
+                }
+            val transport = transport(engine)
+
+            val failure = runCatching { transport.request(HttpMethod.Get, "/v1/models") }.exceptionOrNull()
+
+            assertIs<TransportException.Timeout>(failure)
+            transport.close()
+        }
+
+    @Test
+    fun treatsAnInnerCancellationAsAConnectionFailure() {
+        // Only a head-level `CancellationException` is a caller abort. One below the head is an engine wrapper;
+        // treating it as an abort would stop the retry of a real transport failure, which is the bug this
+        // classifier exists to avoid.
+        val failure = ClosedByteChannelException(CancellationException("engine cancelled"))
+
+        assertEquals(TransportFailureKind.Connection, failure.transportFailureKind())
+    }
 
     @Test
     fun buildsTheRequestFromTheBaseUrlAndThePath() =

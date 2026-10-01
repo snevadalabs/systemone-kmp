@@ -24,23 +24,43 @@ internal enum class TransportFailureKind {
 }
 
 /**
+ * How deep [transportFailureKind] follows a cause chain. Ktor wraps the real failure under a channel
+ * exception, so the class that names the kind is rarely the outermost one; the cap stops a self-referential
+ * or cyclic cause from hanging the classifier.
+ */
+private const val MAX_CAUSE_DEPTH = 16
+
+/**
  * Classifies a failure thrown by Ktor or an engine, so the retry predicate and the boundary translate a call the
  * same way. `CancellationException` is never a transport failure: the caller aborted.
+ *
+ * The chain is walked, not just the head: CIO surfaces a stalled read as `ClosedByteChannelException`, an
+ * `IOException` that wraps the real `SocketTimeoutException`. Classifying the head alone would report that
+ * timeout as a connection failure. A timeout anywhere wins over an outer `IOException`.
  */
 internal fun Throwable.transportFailureKind(): TransportFailureKind? {
-    val cause = unwrapCancellationException()
-    if (cause is CancellationException) return null
-    return when (cause) {
-        // Ktor's own `isTimeoutException()` is private, so the three-class check is reimplemented here.
-        is HttpRequestTimeoutException,
-        is ConnectTimeoutException,
-        is SocketTimeoutException,
-        -> TransportFailureKind.Timeout
+    // Only a head-level `CancellationException` is a caller abort, matching the original classifier and
+    // `unwrapCancellationException`'s own peel. A `CancellationException` below the head is an engine wrapper,
+    // not a caller abort, and must not veto a retry.
+    val head = unwrapCancellationException()
+    if (head is CancellationException) return null
 
-        is IOException -> TransportFailureKind.Connection
+    var cause: Throwable? = head
+    var sawConnection = false
+    var depth = 0
+    while (cause != null && depth++ < MAX_CAUSE_DEPTH) {
+        when (cause) {
+            // Ktor's own `isTimeoutException()` is private, so the three-class check is reimplemented here.
+            is HttpRequestTimeoutException,
+            is ConnectTimeoutException,
+            is SocketTimeoutException,
+            -> return TransportFailureKind.Timeout
 
-        else -> null
+            is IOException -> sawConnection = true
+        }
+        cause = cause.cause
     }
+    return if (sawConnection) TransportFailureKind.Connection else null
 }
 
 /** Whether [this] failure is retried by [policy]. */
