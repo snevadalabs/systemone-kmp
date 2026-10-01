@@ -1,9 +1,7 @@
 package com.sierranevadalabs.systemone.sdk
 
-import com.sierranevadalabs.systemone.sdk.errors.APIResponseValidationError
 import com.sierranevadalabs.systemone.sdk.errors.asPublicError
 import com.sierranevadalabs.systemone.sdk.errors.errorFor
-import com.sierranevadalabs.systemone.sdk.errors.parseBody
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.delay
@@ -11,6 +9,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -210,46 +209,20 @@ internal class SystemOneClientImpl(
 }
 
 /** Reads a Wire System One payload into the response surface, mapping a malformed body to a validation error. */
-internal fun decodeSystemOneResponse(response: TransportResponse): SystemOneResponse {
-    val payload =
-        parseBody(response.body) as? JsonObject
-            ?: throw invalidResponse(response, "expected a JSON object response body", null)
-    val answersBody =
-        payload["answers"] as? JsonObject
-            ?: throw invalidResponse(response, "answers: expected an object field 'answers'", "answers")
-    val answers =
-        try {
-            decodeAnswers(answersBody)
-        } catch (failure: ResponseValidationException) {
-            throw invalidResponse(response, failure.message ?: failure.fieldPath, failure.fieldPath)
-        }
-    return SystemOneResponse(
-        answers = answers,
-        model = (payload["model"] as? JsonPrimitive)?.takeIf { it.isString }?.content,
-        usage = (payload["usage"] as? JsonObject)?.let(::decodeUsage),
-        requestId = response.requestId,
-        status = response.status,
-        headers = response.headers,
-    )
-}
+internal fun decodeSystemOneResponse(response: TransportResponse): SystemOneResponse =
+    decodeBody(response) { payload ->
+        SystemOneResponse(
+            answers = decodeAnswers(payload.requiredObject("answers").element.jsonObject),
+            model = payload.optionalString("model"),
+            usage = payload.optionalObject("usage")?.let(::decodeUsage),
+            requestId = response.requestId,
+            status = response.status,
+            headers = response.headers,
+        )
+    }
 
-private fun invalidResponse(
-    response: TransportResponse,
-    message: String,
-    fieldPath: String?,
-): APIResponseValidationError =
-    APIResponseValidationError(
-        fieldPath = fieldPath,
-        status = response.status,
-        body = parseBody(response.body),
-        requestId = response.requestId,
-        message = message,
-    )
-
-private fun decodeUsage(payload: JsonObject): Usage =
+private fun decodeUsage(payload: WireValue): Usage =
     Usage(
-        inputTokens = payload.intOrNull("input_tokens"),
-        outputTokens = payload.intOrNull("output_tokens"),
+        inputTokens = payload.optionalInt("input_tokens"),
+        outputTokens = payload.optionalInt("output_tokens"),
     )
-
-private fun JsonObject.intOrNull(name: String): Int? = (this[name] as? JsonPrimitive)?.takeIf { !it.isString }?.content?.toIntOrNull()

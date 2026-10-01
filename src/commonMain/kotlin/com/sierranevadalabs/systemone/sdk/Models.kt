@@ -1,11 +1,5 @@
 package com.sierranevadalabs.systemone.sdk
 
-import com.sierranevadalabs.systemone.sdk.errors.APIResponseValidationError
-import com.sierranevadalabs.systemone.sdk.errors.parseBody
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Duration
 
 /** The model catalogue: what the API can be asked with. Reached as `client.models`. */
@@ -73,42 +67,26 @@ internal class ModelsApi(
         headers: Map<String, String>?,
     ): List<ModelCard> {
         val response = fetch(timeout, retry, headers)
-        val payload = parseBody(response.body) as? JsonObject
-        val models = payload?.get("models") as? JsonArray
-        if (models == null) {
-            throw APIResponseValidationError(
-                fieldPath = "models",
-                status = response.status,
-                body = parseBody(response.body),
-                requestId = response.requestId,
-                message = "GET /v1/models: expected { models: [...] }",
-            )
+        return decodeBody(
+            response,
+            bodyFieldPath = "models",
+            bodyMessage = MODELS_MESSAGE,
+            prefix = MODELS_PREFIX,
+        ) { payload ->
+            val models = payload.optionalArray("models") ?: throw validationError(response, "models", MODELS_MESSAGE)
+            models.map(::decodeModelCard)
         }
-        return models.mapIndexed { index, element -> decodeModelCard(element, index, response) }
     }
 }
 
-private fun decodeModelCard(
-    element: JsonElement,
-    index: Int,
-    response: TransportResponse,
-): ModelCard {
-    val card = element as? JsonObject
-    val name = (card?.get("name") as? JsonPrimitive)?.takeIf { it.isString }?.content
-    if (card == null || name == null) {
-        throw APIResponseValidationError(
-            fieldPath = "models.$index.name",
-            status = response.status,
-            body = parseBody(response.body),
-            requestId = response.requestId,
-            message = "GET /v1/models: models.$index.name: expected a string field 'name'",
-        )
-    }
-    return ModelCard(
-        name = name,
-        description = card.stringFieldOrNull("description"),
-        releaseDate = card.stringFieldOrNull("release_date"),
+private const val MODELS_PREFIX: String = "GET $MODELS_PATH"
+
+/** The message a `models` body that carries no catalogue produces, whatever shape the failure took. */
+private const val MODELS_MESSAGE: String = "$MODELS_PREFIX: expected { models: [...] }"
+
+private fun decodeModelCard(card: WireValue): ModelCard =
+    ModelCard(
+        name = card.requiredString("name"),
+        description = card.optionalString("description"),
+        releaseDate = card.optionalString("release_date"),
     )
-}
-
-private fun JsonObject.stringFieldOrNull(name: String): String? = (this[name] as? JsonPrimitive)?.takeIf { it.isString }?.content

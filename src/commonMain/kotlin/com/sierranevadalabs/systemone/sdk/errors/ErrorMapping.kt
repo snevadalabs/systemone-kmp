@@ -2,6 +2,7 @@ package com.sierranevadalabs.systemone.sdk.errors
 
 import com.sierranevadalabs.systemone.sdk.TransportException
 import com.sierranevadalabs.systemone.sdk.TransportResponse
+import com.sierranevadalabs.systemone.sdk.parseBody
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -10,10 +11,6 @@ import kotlinx.serialization.json.JsonPrimitive
 
 /** The message length cap both siblings apply to a served error body. */
 private const val MAX_MESSAGE_LENGTH = 200
-
-/** The response body parsed as JSON, or `null` when it is empty or is not JSON. */
-internal fun parseBody(raw: String): JsonElement? =
-    raw.trim().takeIf { it.isNotEmpty() }?.let { body -> runCatching { Json.parseToJsonElement(body) }.getOrNull() }
 
 /**
  * The explanation inside an error body: `{error: string|{message}}`, `{message: string}`,

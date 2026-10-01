@@ -2,7 +2,6 @@ package com.sierranevadalabs.systemone.sdk
 
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 
 /**
  * One answer from the System One API, discriminated by the question's primitive.
@@ -72,21 +71,6 @@ public data class UnknownAnswer(
 ) : Answer
 
 /**
- * A known answer that does not match its own primitive's shape — a missing `noul`, a `choice` with no
- * `probabilities`. Carries the dotted path of the offending field, the way Python's `field_path` does.
- *
- * `internal` because the public error tree in `com.sierranevadalabs.systemone.sdk.errors` is ticket 12's surface;
- * it maps this into the response-validation error once the tree exists.
- */
-internal class ResponseValidationException(
-    val fieldPath: String,
-    detail: String,
-) : Exception("$fieldPath: $detail")
-
-/** Builds a dotted field path. One helper, so every field path in the module reads the same way. */
-internal fun fieldPath(vararg segments: String): String = segments.joinToString(".")
-
-/**
  * Decodes the `answers` object of a System One response.
  *
  * Decoding rules, all pinned by tests:
@@ -95,79 +79,29 @@ internal fun fieldPath(vararg segments: String): String = segments.joinToString(
  * - `score`'s `legend` and `probabilities` arrive keyed by stringified ordinals and surface keyed by integers;
  * - a malformed known answer fails with a [ResponseValidationException] naming the exact field path.
  */
-internal fun decodeAnswers(answers: JsonObject): Map<String, Answer> =
-    answers.entries.associate { (id, payload) -> id to decodeAnswer(id, payload) }
+internal fun decodeAnswers(answers: JsonObject): Map<String, Answer> {
+    val at = WireValue(answers, "answers")
+    return answers.entries.associate { (id, _) -> id to decodeAnswer(at.child(id)) }
+}
 
-private fun decodeAnswer(
-    id: String,
-    payload: JsonElement,
-): Answer {
-    val at = fieldPath("answers", id)
-    val body = payload as? JsonObject ?: throw ResponseValidationException(at, "expected an answer object")
-    val type = body.stringAt("type", fieldPath(at, "type"))
+private fun decodeAnswer(at: WireValue): Answer {
+    val body = at.element as? JsonObject ?: throw ResponseValidationException(at.path, "expected an answer object")
+    val type = at.requiredString("type")
     return when (type) {
-        "noul" -> NoulAnswer(body.doubleAt("noul", fieldPath(at, "noul")))
+        "noul" -> NoulAnswer(at.requiredDouble("noul"))
         "choice" ->
             ChoiceAnswer(
-                choice = body.stringAt("choice", fieldPath(at, "choice")),
-                probabilities = body.stringKeyedDoubles("probabilities", fieldPath(at, "probabilities")),
-                confidence = body.doubleAt("confidence", fieldPath(at, "confidence")),
+                choice = at.requiredString("choice"),
+                probabilities = at.stringKeyedDoubles("probabilities"),
+                confidence = at.requiredDouble("confidence"),
             )
         "score" ->
             ScoreAnswer(
-                score = body.doubleAt("score", fieldPath(at, "score")),
-                legend = body.intKeyedElements("legend", fieldPath(at, "legend")),
-                probabilities = body.intKeyedDoubles("probabilities", fieldPath(at, "probabilities")),
-                confidence = body.doubleAt("confidence", fieldPath(at, "confidence")),
+                score = at.requiredDouble("score"),
+                legend = at.intKeyedElements("legend"),
+                probabilities = at.intKeyedDoubles("probabilities"),
+                confidence = at.requiredDouble("confidence"),
             )
         else -> UnknownAnswer(type, body)
     }
-}
-
-private fun JsonObject.stringAt(
-    name: String,
-    path: String,
-): String =
-    (this[name] as? JsonPrimitive)?.takeIf { it.isString }?.content
-        ?: throw ResponseValidationException(path, "expected a string field '$name'")
-
-private fun JsonObject.doubleAt(
-    name: String,
-    path: String,
-): Double {
-    val value = this[name] as? JsonPrimitive
-    return value?.takeIf { !it.isString }?.content?.toDoubleOrNull()
-        ?: throw ResponseValidationException(path, "expected a numeric field '$name'")
-}
-
-private fun JsonObject.stringKeyedDoubles(
-    name: String,
-    path: String,
-): Map<String, Double> = objectAt(name, path).mapValues { (key, value) -> value.asDouble(fieldPath(path, key)) }
-
-private fun JsonObject.intKeyedDoubles(
-    name: String,
-    path: String,
-): Map<Int, Double> =
-    objectAt(name, path).entries.associate { (key, value) ->
-        key.asScoreOrdinal(path) to value.asDouble(fieldPath(path, key))
-    }
-
-private fun JsonObject.intKeyedElements(
-    name: String,
-    path: String,
-): Map<Int, JsonElement> = objectAt(name, path).entries.associate { (key, value) -> key.asScoreOrdinal(path) to value }
-
-private fun JsonObject.objectAt(
-    name: String,
-    path: String,
-): JsonObject = this[name] as? JsonObject ?: throw ResponseValidationException(path, "expected an object field '$name'")
-
-private fun String.asScoreOrdinal(path: String): Int =
-    toIntOrNull() ?: throw ResponseValidationException(fieldPath(path, this), "expected an integer score ordinal")
-
-private fun JsonElement.asDouble(path: String): Double {
-    val value = this as? JsonPrimitive
-    return value?.takeIf { !it.isString }?.content?.toDoubleOrNull()
-        ?: throw ResponseValidationException(path, "expected a number")
 }

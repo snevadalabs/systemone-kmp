@@ -11,7 +11,6 @@ import com.sierranevadalabs.systemone.sdk.errors.RateLimitError
 import com.sierranevadalabs.systemone.sdk.errors.UnprocessableEntityError
 import com.sierranevadalabs.systemone.sdk.errors.errorFor
 import com.sierranevadalabs.systemone.sdk.errors.extractErrorMessage
-import com.sierranevadalabs.systemone.sdk.errors.parseBody
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
