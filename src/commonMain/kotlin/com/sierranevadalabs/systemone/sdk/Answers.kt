@@ -79,8 +79,10 @@ public data class UnknownAnswer(
  * - `score`'s `legend` and `probabilities` arrive keyed by stringified ordinals and surface keyed by integers;
  * - a malformed known answer fails with a [ResponseValidationException] naming the exact field path.
  */
-internal fun decodeAnswers(answers: JsonObject): Map<String, Answer> {
-    val at = WireValue(answers, "answers")
+internal fun decodeAnswers(at: WireValue): Map<String, Answer> {
+    val answers =
+        at.element as? JsonObject
+            ?: throw ResponseValidationException(at.path, "expected an object field 'answers'")
     return answers.entries.associate { (id, _) -> id to decodeAnswer(at.child(id)) }
 }
 

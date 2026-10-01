@@ -41,18 +41,16 @@ internal class WireValue(
 
     /** The number under [name], or a failure naming the field. A stringified number is not a number. */
     fun requiredDouble(name: String): Double =
-        numericOrNull(name) ?: throw ResponseValidationException(childPath(name), "expected a numeric field '$name'")
+        fetch(name)?.doubleOrNull() ?: throw ResponseValidationException(childPath(name), "expected a numeric field '$name'")
 
     /** The integer under [name], or `null` when it is missing, not a number, or outside `Int`. */
-    fun optionalInt(name: String): Int? =
-        (fetch(name) as? JsonPrimitive)?.takeIf { !it.isString }?.content?.toIntOrNull()
+    fun optionalInt(name: String): Int? = (fetch(name) as? JsonPrimitive)?.takeIf { !it.isString }?.content?.toIntOrNull()
 
     /** The object under [name] as a cursor at its own path, or a failure naming the field. */
     fun requiredObject(name: String): WireValue = WireValue(objectAt(name), childPath(name))
 
     /** The object under [name] as a cursor at its own path, or `null` when it is missing or not an object. */
-    fun optionalObject(name: String): WireValue? =
-        (fetch(name) as? JsonObject)?.let { WireValue(it, childPath(name)) }
+    fun optionalObject(name: String): WireValue? = (fetch(name) as? JsonObject)?.let { WireValue(it, childPath(name)) }
 
     /** The array under [name] as one cursor per element, or `null` when it is missing or not an array. */
     fun optionalArray(name: String): List<WireValue>? {
@@ -64,14 +62,14 @@ internal class WireValue(
     /** The object under [name] as string-keyed numbers, or a failure naming the field or the value's key. */
     fun stringKeyedDoubles(name: String): Map<String, Double> {
         val at = childPath(name)
-        return objectAt(name).mapValues { (key, value) -> value.numberAt(append(at, key)) }
+        return objectAt(name).mapValues { (key, value) -> value.doubleAt(append(at, key)) }
     }
 
     /** The object under [name] as integer-keyed numbers; the wire keys are stringified ordinals. */
     fun intKeyedDoubles(name: String): Map<Int, Double> {
         val at = childPath(name)
         return objectAt(name).entries.associate { (key, value) ->
-            key.scoreOrdinal(append(at, key)) to value.numberAt(append(at, key))
+            key.scoreOrdinal(append(at, key)) to value.doubleAt(append(at, key))
         }
     }
 
@@ -84,9 +82,6 @@ internal class WireValue(
     private fun objectAt(name: String): JsonObject =
         fetch(name) as? JsonObject
             ?: throw ResponseValidationException(childPath(name), "expected an object field '$name'")
-
-    private fun numericOrNull(name: String): Double? =
-        (fetch(name) as? JsonPrimitive)?.takeIf { !it.isString }?.content?.toDoubleOrNull()
 
     /** The value under [name], or `null` when this cursor is not an object or the key is absent. */
     private fun fetch(name: String): JsonElement? = (element as? JsonObject)?.get(name)
@@ -102,9 +97,9 @@ internal class WireValue(
 private fun String.scoreOrdinal(path: String): Int =
     toIntOrNull() ?: throw ResponseValidationException(path, "expected an integer score ordinal")
 
-private fun JsonElement.numberAt(path: String): Double =
-    (this as? JsonPrimitive)?.takeIf { !it.isString }?.content?.toDoubleOrNull()
-        ?: throw ResponseValidationException(path, "expected a number")
+private fun JsonElement.doubleOrNull(): Double? = (this as? JsonPrimitive)?.takeIf { !it.isString }?.content?.toDoubleOrNull()
+
+private fun JsonElement.doubleAt(path: String): Double = doubleOrNull() ?: throw ResponseValidationException(path, "expected a number")
 
 /** The response body parsed as JSON, or `null` when it is empty or is not JSON. */
 internal fun parseBody(raw: String): JsonElement? =

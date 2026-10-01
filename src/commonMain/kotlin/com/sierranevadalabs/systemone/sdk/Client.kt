@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -212,7 +211,7 @@ internal class SystemOneClientImpl(
 internal fun decodeSystemOneResponse(response: TransportResponse): SystemOneResponse =
     decodeBody(response) { payload ->
         SystemOneResponse(
-            answers = decodeAnswers(payload.requiredObject("answers").element.jsonObject),
+            answers = decodeAnswers(payload.requiredObject("answers")),
             model = payload.optionalString("model"),
             usage = payload.optionalObject("usage")?.let(::decodeUsage),
             requestId = response.requestId,
