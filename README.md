@@ -250,15 +250,13 @@ check, the Java 8 bytecode assertion, the coverage floor, and every test target 
 The conformance suite replays `conformance/` — the shared cross-language wire fixtures — through the real client
 over Ktor's `MockEngine`, so it needs no network and no API key.
 
-The live tier hits the real API, so it is opt-in twice over — a Gradle property **and** an environment variable
-— and a default `./gradlew check` can never reach the network or spend money:
+The live tier hits a paid API. It runs only on an explicit request: both a Gradle property **and** an
+environment variable are required, and no CI workflow runs it. A default `./gradlew check` can never reach the
+network or spend money.
 
 ```bash
 TYPESAFE_API_KEY=… ./gradlew jvmTest -Ptypesafe.live=true
 ```
-
-`integration.yml` runs the same command nightly and on every push to `main`, using the `JEV_API_KEY` repository
-secret.
 
 ### Mutation testing, on demand
 
