@@ -613,8 +613,16 @@ val verifyConsumerJvmFloor by tasks.registering {
 
 // The live tier is opt-in through this property; a default `check` can never reach the network or spend money.
 // The API key is checked inside the tests, so `-Ptypesafe.live=true` with no key fails rather than skips.
+// A live run must actually execute: Gradle does not track TYPESAFE_API_KEY, so without this a pass with one
+// key is replayed as UP-TO-DATE after the key changes or disappears, and the missing key never fails. The
+// remote model is non-deterministic, so a cached live result means nothing even when the key is unchanged.
 tasks.named<Test>("jvmTest") {
-    systemProperty("typesafe.live", providers.gradleProperty("typesafe.live").getOrElse("false"))
+    // Resolve once, eagerly: a raw Provider passed to `systemProperty` would be stringified, not resolved, and
+    // both output conditions must read the same value.
+    val liveEnabled = providers.gradleProperty("typesafe.live").getOrElse("false") == "true"
+    systemProperty("typesafe.live", liveEnabled.toString())
+    outputs.upToDateWhen { !liveEnabled }
+    outputs.cacheIf { !liveEnabled }
 }
 
 // Coverage over the SDK source, measured by the JVM tests: Kover supports JVM and Android only, so this is the

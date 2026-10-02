@@ -4,6 +4,7 @@ import com.sierranevadalabs.systemone.sdk.errors.AuthenticationError
 import com.sierranevadalabs.systemone.sdk.errors.BadRequestError
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonPrimitive
+import org.junit.Assume
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -15,14 +16,15 @@ import kotlin.test.assertTrue
  * enough, because that is how the Python suite once fired ~29 live calls from a default test run. A default
  * `./gradlew check` cannot reach the network here. The key is read by this test, not by the SDK.
  *
- * Run it with `TYPESAFE_API_KEY=… ./gradlew jvmTest -Ptypesafe.live=true`, or let `integration.yml` do it.
+ * Run it with `TYPESAFE_API_KEY=… ./gradlew jvmTest -Ptypesafe.live=true`. It runs locally only: no CI
+ * workflow touches the paid API, so a live call happens only on this explicit request.
  * Assertions are loose on purpose: a live model is not a deterministic function.
  */
 class LiveApiTest {
     @Test
     fun modelsListReturnsCards() =
         runBlocking {
-            if (!liveOrSkip()) return@runBlocking
+            assumeLive()
             liveClient().use { client ->
                 val cards = client.models.list()
 
@@ -34,7 +36,7 @@ class LiveApiTest {
     @Test
     fun aMixedThreePrimitiveCallReturnsCalibratedAnswers() =
         runBlocking {
-            if (!liveOrSkip()) return@runBlocking
+            assumeLive()
             liveClient().use { client ->
                 val urgent = noul("urgent", "Does this convey urgency?")
                 val category = choice("category", "What is this about?", mapOf("billing" to null, "technical" to null))
@@ -62,9 +64,9 @@ class LiveApiTest {
         }
 
     @Test
-    fun aBadKeyRaisesTheAuthenticationError() =
+    fun aBadKeyRaisesTheAuthenticationError() {
         runBlocking {
-            if (!liveOrSkip()) return@runBlocking
+            assumeLive()
             val failure =
                 runCatching {
                     SystemOneClient(SystemOneConfig(apiKey = "definitely-not-a-real-key"))
@@ -73,11 +75,12 @@ class LiveApiTest {
 
             assertIs<AuthenticationError>(failure)
         }
+    }
 
     @Test
     fun anUnknownModelRaisesABadRequestNamingIt() =
         runBlocking {
-            if (!liveOrSkip()) return@runBlocking
+            assumeLive()
             val model = "definitely-not-a-real-model"
 
             val failure =
@@ -91,13 +94,12 @@ class LiveApiTest {
 }
 
 /**
- * Whether the live suite is enabled. The Gradle property is the gate; a missing key with the gate on is an
- * error rather than a silent skip, so an opt-in that cannot run says so.
+ * Skips the test unless the live suite was explicitly requested. The Gradle property is the request; a missing
+ * key with the request on is an error rather than a skip, so an opt-in that cannot run says so.
  */
-private fun liveOrSkip(): Boolean {
-    if (System.getProperty("typesafe.live") != "true") return false
+private fun assumeLive() {
+    Assume.assumeTrue("typesafe.live is not true", System.getProperty("typesafe.live") == "true")
     check(!System.getenv(LIVE_API_KEY_ENV).isNullOrBlank()) { "typesafe.live=true requires $LIVE_API_KEY_ENV in the environment" }
-    return true
 }
 
 /** The variable this test reads. The SDK itself reads no environment. */
